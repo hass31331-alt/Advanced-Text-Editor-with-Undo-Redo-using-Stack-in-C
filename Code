@@ -1,0 +1,61 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+#define MAX 100
+
+typedef struct {
+    char data[MAX][100];
+    int top;
+} Stack;
+
+void init(Stack *s) { s->top = -1; }
+
+void push(Stack *s, char *text) {
+    if (s->top < MAX - 1) {
+        s->top++;
+        strcpy(s->data[s->top], text);
+    }
+}
+
+char* pop(Stack *s) {
+    if (s->top >= 0) return s->data[s->top--];
+    return "";
+}
+
+int main() {
+    Stack undo, redo;
+    char text[100] = "";
+    char input[100];
+    int choice;
+
+    init(&undo);
+    init(&redo);
+
+    while (1) {
+        printf("\nCurrent Text: %s\n", text);
+        printf("1. Write Text\n2. Undo\n3. Redo\n4. Exit\n");
+        scanf("%d", &choice);
+        getchar();
+
+        switch (choice) {
+            case 1:
+                push(&undo, text);
+                fgets(input, 100, stdin);
+                input[strcspn(input, "\n")] = 0;
+                strcpy(text, input);
+                init(&redo);
+                break;
+            case 2:
+                push(&redo, text);
+                strcpy(text, pop(&undo));
+                break;
+            case 3:
+                push(&undo, text);
+                strcpy(text, pop(&redo));
+                break;
+            case 4:
+                exit(0);
+        }
+    }
+}
